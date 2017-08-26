@@ -79,6 +79,16 @@ var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = [
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
+var _path = __webpack_require__(1);
+
+var _path2 = _interopRequireDefault(_path);
+
+var _express = __webpack_require__(2);
+
+var _express2 = _interopRequireDefault(_express);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
@@ -108,7 +118,7 @@ exports.default = function (app) {
   app.get('/explorer', renderExplorer);
   app.get('/explorer/config', configsHandler);
 
-  app.use('/explorer', express.static(path.join(__dirname, '../page')));
+  app.use('/explorer', _express2.default.static(_path2.default.join(__dirname, '../page')));
 };
 
 /**
@@ -233,7 +243,7 @@ function _isEndPointHandler(router) {
  * @param next
  */
 function renderExplorer(req, res, next) {
-  res.sendFile(path.join(__dirname, '../page/index.html'));
+  res.sendFile(_path2.default.join(__dirname, '../page/index.html'));
 }
 
 function configsHandler(req, res, next) {
@@ -334,7 +344,19 @@ function generateTags(apiRouters) {
     };
   });
 }
-/* WEBPACK VAR INJECTION */}.call(exports, "/"))
+/* WEBPACK VAR INJECTION */}.call(exports, "src"))
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports) {
+
+module.exports = require("path");
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports) {
+
+module.exports = require("express");
 
 /***/ })
 /******/ ]);

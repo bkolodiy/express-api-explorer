@@ -14,5 +14,12 @@ export default {
         use: 'babel-loader'
       }
     ]
+  },
+  target: 'node',
+  node: {
+    __dirname: true
+  },
+  externals: {
+    express: 'express'
   }
 }

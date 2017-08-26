@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/Emiya0306/express-api-explorer#readme",
   "dependencies": {
+    "express": "^4.15.4"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
