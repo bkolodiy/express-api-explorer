@@ -9,17 +9,22 @@ let swaggerConfigs;
  * on express app.
  *
  * @param app {Object} Express instance
- * @param rootPath {String} Root api path
+ * @param options {Object} Root api path
  */
-export default (app, rootPath = '/api') => {
+module.exports = (app, options) => {
+  const {
+    rootPath = '/api',
+    explorerPath = '/explorer'
+  } = options;
+
   const rootApiRouter = getRootApiRouter(app, rootPath);
 
   const apiRouters = rootApiRouter.handle.stack.map(router => getApiRouters(router));
 
   swaggerConfigs = getSwaggerConfigs(rootApiRouter, apiRouters);
 
-  app.get('/explorer', renderExplorer);
-  app.get('/explorer/config', configsHandler);
+  app.get(explorerPath, renderExplorer);
+  app.get(`${explorerPath}/config`, configsHandler);
 
   app.use('/explorer', express.static(path.join(__dirname, '../page')));
 }

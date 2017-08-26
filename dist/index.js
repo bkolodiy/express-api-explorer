@@ -69,11 +69,7 @@ module.exports =
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(__dirname) {
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
@@ -101,11 +97,14 @@ var swaggerConfigs = void 0;
  * on express app.
  *
  * @param app {Object} Express instance
- * @param rootPath {String} Root api path
+ * @param options {Object} Root api path
  */
+module.exports = function (app, options) {
+  var _options$rootPath = options.rootPath,
+      rootPath = _options$rootPath === undefined ? '/api' : _options$rootPath,
+      _options$explorerPath = options.explorerPath,
+      explorerPath = _options$explorerPath === undefined ? '/explorer' : _options$explorerPath;
 
-exports.default = function (app) {
-  var rootPath = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '/api';
 
   var rootApiRouter = getRootApiRouter(app, rootPath);
 
@@ -115,8 +114,8 @@ exports.default = function (app) {
 
   swaggerConfigs = getSwaggerConfigs(rootApiRouter, apiRouters);
 
-  app.get('/explorer', renderExplorer);
-  app.get('/explorer/config', configsHandler);
+  app.get(explorerPath, renderExplorer);
+  app.get(explorerPath + '/config', configsHandler);
 
   app.use('/explorer', _express2.default.static(_path2.default.join(__dirname, '../page')));
 };
@@ -128,8 +127,6 @@ exports.default = function (app) {
  * @param apiPath {String} Root api path
  * @returns rootRouter {Object} Express router layer
  */
-
-
 function getRootApiRouter(app, apiPath) {
   return app._router.stack.find(function (stack) {
     return stack.regexp.test(apiPath) && stack.name === 'router';
@@ -324,13 +321,7 @@ function generatePaths(apiRouters) {
 }
 
 function getRouteParameters(route) {
-  return [{
-    in: "body",
-    name: "body",
-    description: "Pet object that needs to be added to the store",
-    required: true,
-    schema: {}
-  }];
+  return [];
 }
 
 function generateTags(apiRouters) {
@@ -344,7 +335,6 @@ function generateTags(apiRouters) {
     };
   });
 }
-/* WEBPACK VAR INJECTION */}.call(exports, "src"))
 
 /***/ }),
 /* 1 */

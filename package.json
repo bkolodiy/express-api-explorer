@@ -4,9 +4,9 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
+    "example": "node example/simple-usage.js",
     "test": "babel-node ./test",
-    "build": "babel-node build/build.js",
-    "dev": "babel-node"
+    "build": "babel-node build/build.js"
   },
   "repository": {
     "type": "git",

@@ -1,5 +1,5 @@
-import express from 'express'
-import apiExplorer from '../dist'
+import express from 'express';
+import apiExplorer from '../dist';
 
 var mainRouter = express.Router();
 var userRouter = express.Router();
@@ -41,6 +41,8 @@ function getAddressHandler(req, res, next) {
   res.json('getAddressHandler')
 }
 
-apiExplorer(app, '/api');
+apiExplorer(app, {
+  rootPath: '/api'
+});
 
 app.listen(8080, '127.0.0.1');
