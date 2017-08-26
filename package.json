@@ -1,0 +1,40 @@
+{
+  "name": "express-api-explorer",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "babel-node ./test",
+    "build": "",
+    "dev": "babel-node "
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Emiya0306/express-api-explorer.git"
+  },
+  "keywords": [
+    "express",
+    "restful",
+    "explorer",
+    "expressjs",
+    "api"
+  ],
+  "author": "Emiya0306",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Emiya0306/express-api-explorer/issues"
+  },
+  "homepage": "https://github.com/Emiya0306/express-api-explorer#readme",
+  "dependencies": {
+    "swagger-ui": "^3.1.6",
+    "tween": "^0.9.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "express": "^4.15.4",
+    "webpack": "^3.5.5"
+  }
+}
