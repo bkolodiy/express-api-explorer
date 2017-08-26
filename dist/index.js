@@ -144,8 +144,8 @@ function getApiRouters(apiRouter) {
   var parentRouter = apiRouter;
 
   if (!_isEndPointHandler(parentRouter)) {
-    console.log(parentRouter);
-    var stacks = parentRouter.handle.stack;
+    // prevent middleware function to search route
+    var stacks = parentRouter.handle.stack || [];
 
     var _iteratorNormalCompletion = true;
     var _didIteratorError = false;
