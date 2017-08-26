@@ -2,11 +2,11 @@
   "name": "express-api-explorer",
   "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "babel-node ./test",
-    "build": "",
-    "dev": "babel-node "
+    "build": "babel-node build/build.js",
+    "dev": "babel-node"
   },
   "repository": {
     "type": "git",
@@ -26,8 +26,6 @@
   },
   "homepage": "https://github.com/Emiya0306/express-api-explorer#readme",
   "dependencies": {
-    "swagger-ui": "^3.1.6",
-    "tween": "^0.9.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
