@@ -1,5 +1,5 @@
 import express from 'express';
-import apiExplorer from '../dist';
+import apiExplorer from '../src';
 
 var mainRouter = express.Router();
 var userRouter = express.Router();

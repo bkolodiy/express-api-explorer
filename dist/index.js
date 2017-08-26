@@ -144,6 +144,7 @@ function getApiRouters(apiRouter) {
   var parentRouter = apiRouter;
 
   if (!_isEndPointHandler(parentRouter)) {
+    console.log(parentRouter);
     var stacks = parentRouter.handle.stack;
 
     var _iteratorNormalCompletion = true;
@@ -321,7 +322,13 @@ function generatePaths(apiRouters) {
 }
 
 function getRouteParameters(route) {
-  return [];
+  return [{
+    in: "body",
+    name: "body",
+    description: "Pet object that needs to be added to the store",
+    required: true,
+    schema: {}
+  }];
 }
 
 function generateTags(apiRouters) {

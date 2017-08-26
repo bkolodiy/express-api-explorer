@@ -4,3 +4,5 @@ src
 test
 .babelrc
 .gitignore
+.idea
+.npmignore
