@@ -52,9 +52,9 @@ function getApiRouters(apiRouter) {
   let result = [];
   const parentRouter = apiRouter;
 
-  if (!_isEndPointHandler(parentRouter)) {
-    // prevent middleware function to search route
-    const stacks = parentRouter.handle.stack || [];
+  // prevent middleware function to search child route
+  if (!_isEndPointHandler(parentRouter) && parentRouter.handle.stack) {
+    const stacks = parentRouter.handle.stack;
 
     for (const stack of stacks) {
       let childRouters = getApiRouters(stack);
