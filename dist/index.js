@@ -108,7 +108,9 @@ module.exports = function (app, options) {
 
   var rootApiRouter = getRootApiRouter(app, rootPath);
 
-  var apiRouters = rootApiRouter.handle.stack.map(function (router) {
+  var apiRouters = rootApiRouter.handle.stack.filter(function (router) {
+    return !_isMiddleware(router);
+  }).map(function (router) {
     return getApiRouters(router);
   });
 
@@ -144,7 +146,7 @@ function getApiRouters(apiRouter) {
   var parentRouter = apiRouter;
 
   // prevent middleware function to search child route
-  if (!_isEndPointHandler(parentRouter) && parentRouter.handle.stack) {
+  if (!_isEndPointHandler(parentRouter)) {
     var stacks = parentRouter.handle.stack;
 
     var _iteratorNormalCompletion = true;
@@ -220,6 +222,18 @@ function _getPath(regexp) {
   .replace(/^\/\^\\/, '')
   // remove /path regexp postfix
   .replace(/\\\/\?\(\?=\\\/\|\$\)\/i$/, '');
+}
+
+/**
+ * Don't have route prototype and the name is not 'router'
+ * Also don't have stack => middle ware
+ *
+ * @param router
+ * @returns {boolean}
+ * @private
+ */
+function _isMiddleware(router) {
+  return !_isEndPointHandler(router) && !router.handle.stack;
 }
 
 /**

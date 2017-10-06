@@ -19,7 +19,9 @@ module.exports = (app, options) => {
 
   const rootApiRouter = getRootApiRouter(app, rootPath);
 
-  const apiRouters = rootApiRouter.handle.stack.map(router => getApiRouters(router));
+  const apiRouters = rootApiRouter.handle.stack
+    .filter(router => !_isMiddleware(router))
+    .map(router => getApiRouters(router));
 
   swaggerConfigs = getSwaggerConfigs(rootApiRouter, apiRouters);
 
@@ -53,7 +55,7 @@ function getApiRouters(apiRouter) {
   const parentRouter = apiRouter;
 
   // prevent middleware function to search child route
-  if (!_isEndPointHandler(parentRouter) && parentRouter.handle.stack) {
+  if (!_isEndPointHandler(parentRouter)) {
     const stacks = parentRouter.handle.stack;
 
     for (const stack of stacks) {
@@ -104,6 +106,18 @@ function _getPath(regexp) {
     .replace(/^\/\^\\/, '')
     // remove /path regexp postfix
     .replace(/\\\/\?\(\?=\\\/\|\$\)\/i$/, '');
+}
+
+/**
+ * Don't have route prototype and the name is not 'router'
+ * Also don't have stack => middle ware
+ *
+ * @param router
+ * @returns {boolean}
+ * @private
+ */
+function _isMiddleware(router) {
+  return !_isEndPointHandler(router) && !router.handle.stack;
 }
 
 /**
