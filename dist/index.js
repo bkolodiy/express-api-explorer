@@ -90,6 +90,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 var swaggerConfigs = void 0;
+var ApiName = 'API NAME HERE';
 
 /**
  * Main Entry Code
@@ -99,27 +100,37 @@ var swaggerConfigs = void 0;
  * @param app {Object} Express instance
  * @param options {Object} Root api path
  */
-module.exports = function (app, options) {
+module.exports = function (app) {
+  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+  console.log('--------------------------------------');
   var _options$rootPath = options.rootPath,
-      rootPath = _options$rootPath === undefined ? '/api' : _options$rootPath,
+      rootPath = _options$rootPath === undefined ? null : _options$rootPath,
       _options$explorerPath = options.explorerPath,
-      explorerPath = _options$explorerPath === undefined ? '/explorer' : _options$explorerPath;
+      explorerPath = _options$explorerPath === undefined ? '/explorer' : _options$explorerPath,
+      ApiName = options.ApiName;
 
 
-  var rootApiRouter = getRootApiRouter(app, rootPath);
+  var routes = getRootApiRouter(app, rootPath);
 
-  var apiRouters = rootApiRouter.handle.stack.filter(function (router) {
-    return !_isMiddleware(router);
-  }).map(function (router) {
-    return getApiRouters(router);
+  var apiRouters = [];
+
+  routes.forEach(function (item) {
+    apiRouters.push.apply(apiRouters, _toConsumableArray(item.handle.stack.filter(function (router) {
+      return !_isMiddleware(router);
+    }).map(function (router) {
+      return getApiRouters(router);
+    })));
   });
 
-  swaggerConfigs = getSwaggerConfigs(rootApiRouter, apiRouters);
+  console.log("apiRouters", apiRouters);
+  swaggerConfigs = getSwaggerConfigs(routes, apiRouters);
 
   app.get(explorerPath, renderExplorer);
-  app.get(explorerPath + '/config', configsHandler);
+  app.get('/config', configsHandler);
 
-  app.use('/explorer', _express2.default.static(_path2.default.join(__dirname, '../page')));
+  app.use('' + explorerPath, _express2.default.static(_path2.default.join(__dirname, '../page')));
+  console.log('--------------------------------------');
 };
 
 /**
@@ -130,9 +141,30 @@ module.exports = function (app, options) {
  * @returns rootRouter {Object} Express router layer
  */
 function getRootApiRouter(app, apiPath) {
-  return app._router.stack.find(function (stack) {
-    return stack.regexp.test(apiPath) && stack.name === 'router';
-  });
+  if (apiPath) {
+    return app._router.stack.filter(function (stack) {
+      return stack.regexp.test(apiPath) && stack.name === 'router';
+    });
+  } else {
+
+    return app._router.stack.filter(function (stack) {
+      return stack.name === 'router';
+    });
+
+    var tmpRouter = new _express2.default.Router();
+
+    var routers = app._router.stack.forEach(function (r) {
+      if (function (r) {
+        return r.name === 'router';
+      }) {
+        tmpRouter.use('/api', r.handle);
+      }
+    });
+    console.log(tmpRouter);
+    return tmpRouter.stack.find(function (stack) {
+      return stack.regexp.test('/api') && stack.name === 'router';
+    });
+  }
 }
 
 /**
@@ -199,6 +231,7 @@ function getHandlerInfo(router) {
       _router$route$stack$ = _router$route$stack[0],
       handler = _router$route$stack$ === undefined ? {} : _router$route$stack$;
 
+  console.log('Handler: ' + JSON.stringify(router, null, 2));
   return {
     path: router.route.path,
     method: handler.method,
@@ -217,16 +250,17 @@ function getHandlerInfo(router) {
  * @private
  */
 function _getPath(regexp) {
-  return regexp.toString()
+  var result = regexp.toString()
   // remove /path regexp prefix
   .replace(/^\/\^\\/, '')
   // remove /path regexp postfix
-  .replace(/\\\/\?\(\?=\\\/\|\$\)\/i$/, '');
+  .replace(/\\\/\?\(\?=\\\/\|\$\)\/i$/, '').replace(/\/\?\(\?=\\\/\|\$\)\/i/, '');
+  return result;
 }
 
 /**
  * Don't have route prototype and the name is not 'router'
- * Also don't have stack => middle ware
+ * Also don't have stack => middleware
  *
  * @param router
  * @returns {boolean}
@@ -263,18 +297,34 @@ function configsHandler(req, res, next) {
 }
 
 function getSwaggerConfigs(mainApiRouter, apiRouters) {
-  var basePath = _getPath(mainApiRouter.regexp);
-  var tags = generateTags(apiRouters);
-  var paths = generatePaths(apiRouters);
+  var basePath = '/';
+  var tags = [];
+  var paths = {};
+  mainApiRouter.forEach(function (router) {
+    var apiRoutes = router.handle.stack.filter(function (router) {
+      return !_isMiddleware(router);
+    }).map(function (router) {
+      return getApiRouters(router);
+    });
+    var path = _getPath(router.regexp);
+
+    tags.push.apply(tags, _toConsumableArray(generateTags(apiRoutes)));
+    if (path) tags.push({ name: path.split('/').pop(), description: "" });
+    Object.assign(paths, generatePaths(apiRoutes, path));
+  });
 
   return {
+    info: {
+      version: "v1",
+      title: ApiName
+    },
     basePath: basePath,
     tags: tags,
     paths: paths
   };
 }
 
-function generatePaths(apiRouters) {
+function generatePaths(apiRouters, basePath) {
   var routes = {};
 
   var _iteratorNormalCompletion2 = true;
@@ -293,11 +343,16 @@ function generatePaths(apiRouters) {
           var route = _step3.value;
 
           var tagName = apiRouter[0].path.split('/')[1];
+          var tags = [tagName];
+
+          if (basePath) {
+            tags.push(basePath.split('/')[1]);
+          }
 
           var parameters = getRouteParameters(route);
 
-          routes[route.path] = _extends({}, routes[route.path], _defineProperty({}, route.method, {
-            tags: [tagName],
+          routes[basePath + route.path] = _extends({}, routes[basePath + route.path], _defineProperty({}, route.method, {
+            tags: tags,
             summary: route.name,
             parameters: parameters
           }));
