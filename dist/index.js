@@ -102,8 +102,6 @@ var ApiName = 'API NAME HERE';
  */
 module.exports = function (app) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-  console.log('--------------------------------------');
   var _options$rootPath = options.rootPath,
       rootPath = _options$rootPath === undefined ? null : _options$rootPath,
       _options$explorerPath = options.explorerPath,
@@ -123,14 +121,12 @@ module.exports = function (app) {
     })));
   });
 
-  console.log("apiRouters", apiRouters);
   swaggerConfigs = getSwaggerConfigs(routes, apiRouters);
 
   app.get(explorerPath, renderExplorer);
   app.get('/config', configsHandler);
 
   app.use('' + explorerPath, _express2.default.static(_path2.default.join(__dirname, '../page')));
-  console.log('--------------------------------------');
 };
 
 /**
@@ -160,7 +156,6 @@ function getRootApiRouter(app, apiPath) {
         tmpRouter.use('/api', r.handle);
       }
     });
-    console.log(tmpRouter);
     return tmpRouter.stack.find(function (stack) {
       return stack.regexp.test('/api') && stack.name === 'router';
     });
@@ -231,7 +226,6 @@ function getHandlerInfo(router) {
       _router$route$stack$ = _router$route$stack[0],
       handler = _router$route$stack$ === undefined ? {} : _router$route$stack$;
 
-  console.log('Handler: ' + JSON.stringify(router, null, 2));
   return {
     path: router.route.path,
     method: handler.method,
