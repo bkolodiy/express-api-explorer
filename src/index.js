@@ -13,7 +13,6 @@ let ApiName = 'API NAME HERE'
  * @param options {Object} Root api path
  */
 module.exports = (app, options = {}) => {
-  console.log('--------------------------------------')
   const {
     rootPath = null,
     explorerPath = '/explorer',
@@ -23,21 +22,19 @@ module.exports = (app, options = {}) => {
   const routes = getRootApiRouter(app, rootPath);
 
   const apiRouters = [];
-  
+
   routes.forEach(item => {
     apiRouters.push(...item.handle.stack
     .filter(router => !_isMiddleware(router))
     .map(router => getApiRouters(router)));
   })
 
-  console.log("apiRouters", apiRouters)
   swaggerConfigs = getSwaggerConfigs(routes, apiRouters);
 
   app.get(explorerPath, renderExplorer);
   app.get(`/config`, configsHandler);
 
   app.use(`${explorerPath}`, express.static(path.join(__dirname, '../page')));
-  console.log('--------------------------------------')
 }
 
 /**
@@ -59,17 +56,16 @@ function getRootApiRouter(app, apiPath) {
     );
 
     let tmpRouter =  new express.Router();
-    
+
     const routers = app._router.stack.forEach(r => {
       if (r => r.name === 'router'){
         tmpRouter.use('/api', r.handle);
       }
     });
-    console.log(tmpRouter);
     return tmpRouter.stack.find(
       stack => stack.regexp.test('/api') && stack.name === 'router'
     )
-  }  
+  }
 }
 
 /**
@@ -88,7 +84,7 @@ function getApiRouters(apiRouter) {
 
     for (const stack of stacks) {
       let childRouters = getApiRouters(stack);
-      
+
       childRouters = childRouters.map(childRouter => ({
           ...childRouter,
           path: _getPath(parentRouter.regexp) + childRouter.path
@@ -112,7 +108,6 @@ function getApiRouters(apiRouter) {
  */
 function getHandlerInfo(router) {
   const [handler = {}] = router.route.stack;
-  console.log(`Handler: ${JSON.stringify(router, null, 2,)}`)
   return {
     path: router.route.path,
     method: handler.method,
@@ -187,13 +182,13 @@ function getSwaggerConfigs(mainApiRouter, apiRouters) {
       .filter(router => !_isMiddleware(router))
       .map(router => getApiRouters(router));
     let path = _getPath(router.regexp);
-    
+
 
     tags.push(...generateTags(apiRoutes));
     if(path) tags.push({name: path.split('/').pop(), description: ""});
-    Object.assign(paths, generatePaths(apiRoutes, path));    
+    Object.assign(paths, generatePaths(apiRoutes, path));
   })
-  
+
   return {
     info: {
       version: "v1",
